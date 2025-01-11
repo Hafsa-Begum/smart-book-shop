@@ -1,0 +1,85 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Book {
+  id              String       @id @default(auto()) @map("_id") @db.ObjectId
+  title           String
+  author          String
+  description     String?
+  coverImage      String?      // URL to the book's cover image
+  publishedDate   DateTime?
+  price           Float        // Actual selling price
+  strikethroughPrice Float?    // Original price before discount
+  discount        Float?       // Discount percentage (e.g., 20 for 20%)
+  isNewArrival    Boolean      @default(false) // Flag for new arrivals
+  categoryId      String       @db.ObjectId
+  category        BookCategory @relation("CategoryBooks", fields: [categoryId], references: [id])
+  ratings         Rating[]
+  reviews         Review[]
+  // Relations for Recommendations
+  recommendedBooksFrom Recommendation[] @relation("RecommendationsFrom")
+  recommendedBooksTo   Recommendation[] @relation("RecommendationsTo")
+
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+}
+
+model Recommendation {
+  id         String @id @default(auto()) @map("_id") @db.ObjectId
+  fromBookId String @db.ObjectId
+  toBookId   String @db.ObjectId
+
+  fromBook   Book   @relation("RecommendationsFrom", fields: [fromBookId], references: [id])
+  toBook     Book   @relation("RecommendationsTo", fields: [toBookId], references: [id])
+
+  createdAt  DateTime @default(now())
+}
+
+model BookCategory {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String   @unique
+  description String?
+  books       Book[]   @relation("CategoryBooks")
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Rating {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  score     Int      // 1-5 scale
+  userId    String   @db.ObjectId
+  bookId    String   @db.ObjectId
+  book      Book     @relation(fields: [bookId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model Review {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  content   String
+  userId    String   @db.ObjectId
+  bookId    String   @db.ObjectId
+  book      Book     @relation(fields: [bookId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model User {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  email     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+

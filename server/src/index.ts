@@ -2,6 +2,7 @@ import express from 'express'
 import dotenv from 'dotenv'
 import cors from 'cors'
 import morgan from 'morgan'
+import { createNewBook , createNewBookCategory, getBookCategory, getBooks} from './controllers';
 
 dotenv.config();
 
@@ -13,6 +14,12 @@ app.use(morgan('dev'))
 app.get('/health', (req, res)=>{
     res.status(200).json({status:'Up'})
 })
+//routes
+app.get('/book/get', getBooks);
+app.post('/book/create', createNewBook);
+app.get('/book-category/get', getBookCategory);
+app.post('/book-category/create', createNewBookCategory);
+
 app.use((req, res)=>{
     res.status(404).json({message:'Not found'})
 })

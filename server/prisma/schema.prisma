@@ -25,8 +25,8 @@ model Book {
   discount        Float?       // Discount percentage (e.g., 20 for 20%)
   isNewArrival    Boolean      @default(false) // Flag for new arrivals
   categoryId      String       @db.ObjectId
+  categoryName    String       @default("")
   category        BookCategory @relation("CategoryBooks", fields: [categoryId], references: [id])
-  ratings         Rating[]
   reviews         Review[]
   // Relations for Recommendations
   recommendedBooksFrom Recommendation[] @relation("RecommendationsFrom")
@@ -57,19 +57,11 @@ model BookCategory {
   updatedAt   DateTime @updatedAt
 }
 
-model Rating {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  score     Int      // 1-5 scale
-  userId    String   @db.ObjectId
-  bookId    String   @db.ObjectId
-  book      Book     @relation(fields: [bookId], references: [id])
-  createdAt DateTime @default(now())
-}
-
 model Review {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  score     Int      @default(0)// 1-5 scale
   content   String
-  userId    String   @db.ObjectId
+  userId    String?   @db.ObjectId
   bookId    String   @db.ObjectId
   book      Book     @relation(fields: [bookId], references: [id])
   createdAt DateTime @default(now())

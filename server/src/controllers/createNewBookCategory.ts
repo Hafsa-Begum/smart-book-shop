@@ -1,27 +1,27 @@
 import prisma from "@/prisma";
-import { createBookSchema} from "@/schemas";
+import { createBookCategorySchema} from "@/schemas";
 import { Request, Response, NextFunction } from "express";
 
 type AsyncRequestHandler = (req: Request, res: Response, next: NextFunction) => Promise<void>;
 
-const createNewBook:AsyncRequestHandler = async(req, res, next)=>{
+const createNewBookCategory:AsyncRequestHandler = async(req, res, next)=>{
     try {
         //validate request body
-        const parsedBody = createBookSchema.safeParse(req.body);
+        const parsedBody = createBookCategorySchema.safeParse(req.body);
         if(!parsedBody.success){
             res.status(400).json({
                 error: parsedBody.error.errors
             })
             return;
         }
-        const book = await prisma.book.create({
+        const bookCategory = await prisma.bookCategory.create({
             data:{
                 ...parsedBody.data
             }
         })
-        console.log('User created successfully', book)
+        console.log('Category created successfully', bookCategory)
         res.status(200).json({
-            message: 'New book created successfully.'
+            message: 'New category created successfully.'
         });
         return;
     } catch (error) {
@@ -29,4 +29,4 @@ const createNewBook:AsyncRequestHandler = async(req, res, next)=>{
     }
 }
 
-export default createNewBook;
+export default createNewBookCategory;
